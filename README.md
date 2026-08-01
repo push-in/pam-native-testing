@@ -2,6 +2,10 @@
 
 Deterministic, strict bridge testing for PAM Native applications and plugins.
 
+```bash
+composer require --dev pushinbr/pam-native-testing
+```
+
 ```php
 $native = NativeTestHarness::install();
 $native->succeed('auth.session', 'current', [
