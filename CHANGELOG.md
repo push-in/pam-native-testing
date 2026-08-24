@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 - 2026-08-24
+## 0.3.0 - 2026-08-24
 
 - Add platform-neutral golden-image comparison with explicit error tolerances.
 - Add startup screen health checks that reject black and transparent frames.
