@@ -21,13 +21,13 @@ final class FakeNativeModuleTransport implements NativeModuleTransport
     /** @var list<RecordedModuleCall> */
     private array $calls = [];
 
+    /** @param array<string, string|int|float|bool> $values */
     public function succeed(
         string $module,
         string $method,
         array $values = [],
         DispatchMode $dispatchMode = DispatchMode::Immediate,
     ): self {
-        /** @var array<string, string|int|float|bool> $values */
         return $this->respond($module, $method, new StubbedModuleResponse(
             ModuleResultStatus::Success,
             Wire::map($values),
@@ -106,7 +106,8 @@ final class FakeNativeModuleTransport implements NativeModuleTransport
 
     public function lastCall(): ?RecordedModuleCall
     {
-        return $this->calls[array_key_last($this->calls)] ?? null;
+        $key = array_key_last($this->calls);
+        return $key === null ? null : $this->calls[$key];
     }
 
     public function assertCalled(string $module, string $method, int $times = 1): void

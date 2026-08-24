@@ -40,6 +40,19 @@ NativeTestHarness::uninstall();
 Responses can be immediate or deferred. Unstubbed calls fail immediately, and
 `assertSatisfied()` detects unused responses and unflushed completions.
 
+Visual certification is deterministic and framework-independent: provide the
+RGBA pixels captured by Android or iOS, reject black/transparent launch frames,
+and compare the result with a golden image using explicit channel and changed-pixel tolerances.
+
+```php
+$health = (new ScreenHealth())->inspect($capturedFrame);
+$diff = (new GoldenComparator(channelTolerance: 0.01))->compare($golden, $capturedFrame);
+
+if (!$health['healthy'] || !$diff->accepted) {
+    throw new RuntimeException('Native screen failed visual certification.');
+}
+```
+
 
 ## What installation does
 
@@ -56,6 +69,9 @@ Use `pam packages` to inspect availability and `pam remove testing` to uninstall
 | `DispatchMode` | Choose immediate or deferred callback execution. |
 | `RecordedModuleCall` | Inspect exact module, method, and payload calls. |
 | `StubbedModuleResponse` | Describe deterministic native results. |
+| `PixelBuffer` | Validate a platform-neutral RGBA screenshot contract. |
+| `ScreenHealth` | Detect black and transparent startup frames. |
+| `GoldenComparator` / `VisualDiff` | Certify screenshots with measurable tolerances. |
 
 All coded states, kinds, and variants are sequential integer-backed enums. Use enum cases in application code; do not depend on raw wire numbers.
 
@@ -76,7 +92,7 @@ All coded states, kinds, and variants are sequential integer-backed enums. Use e
 
 ## Compatibility and support
 
-This package targets PAM Native `0.6.x`, Android API 26+, and iOS 15+ unless a platform-specific section above states a stricter requirement. Platform SDKs, credentials, entitlements, physical hardware, and store configuration remain application responsibilities.
+This package targets PAM Native `0.8.x`, PHP 8.5, Android API 26+, and iOS 15+ unless a platform-specific section above states a stricter requirement. Platform SDKs, credentials, entitlements, physical hardware, and store configuration remain application responsibilities.
 
 - [PAM documentation](https://push-in.github.io/pam-docs/introduction/)
 - [PAM Native overview](https://push-in.github.io/pam-docs/native/overview/)

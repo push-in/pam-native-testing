@@ -28,6 +28,9 @@ use Pam\Native\Modules\NativeModuleResult;
 use Pam\Native\Modules\NativeModules;
 use Pam\Native\Testing\DispatchMode;
 use Pam\Native\Testing\NativeTestHarness;
+use Pam\Native\Testing\Visual\GoldenComparator;
+use Pam\Native\Testing\Visual\PixelBuffer;
+use Pam\Native\Testing\Visual\ScreenHealth;
 
 $tests = [];
 $test = static function (string $name, Closure $callback) use (&$tests): void { $tests[$name] = $callback; };
@@ -44,9 +47,16 @@ $test('dispatches typed successful responses immediately', static function () us
     NativeModules::call('auth.session', 'current', ['refresh' => true], static function (NativeModuleResult $value) use (&$result): void {
         $result = $value;
     });
-    $expect($result instanceof NativeModuleResult && $result->succeeded());
+    if (!$result instanceof NativeModuleResult) {
+        throw new RuntimeException('Native result was not delivered.');
+    }
+    $expect($result->succeeded());
     $expect($result->values() === ['identifier' => 'user-1', 'state' => 2]);
-    $expect(Wire::decodeMap($fake->lastCall()?->payload ?? '') === ['refresh' => true]);
+    $call = $fake->lastCall();
+    if ($call === null) {
+        throw new RuntimeException('Native call was not recorded.');
+    }
+    $expect(Wire::decodeMap($call->payload) === ['refresh' => true]);
     $fake->assertCalled('auth.session', 'current');
     $fake->assertSatisfied();
     NativeTestHarness::uninstall();
@@ -80,6 +90,16 @@ $test('normalizes failures and rejects unstubbed calls', static function () use 
         $expect(str_contains($exception->getMessage(), 'Unexpected native module call'));
     }
     NativeTestHarness::uninstall();
+});
+
+$test('detects black frames and certifies golden pixels deterministically', static function () use ($expect): void {
+    $black = new PixelBuffer(1, 1, [0, 0, 0, 255]);
+    $actual = new PixelBuffer(2, 1, [255, 0, 0, 255, 0, 255, 0, 255]);
+    $expected = new PixelBuffer(2, 1, [255, 0, 0, 255, 0, 254, 0, 255]);
+    $health = (new ScreenHealth())->inspect($black);
+    $diff = (new GoldenComparator(channelTolerance: 0.01))->compare($expected, $actual);
+    $expect(!$health['healthy'] && $health['reason'] === 'black-frame');
+    $expect($diff->accepted && $diff->changedPixels === 0 && $diff->maximumError > 0.0);
 });
 
 $failures = 0;

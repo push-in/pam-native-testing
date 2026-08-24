@@ -13,7 +13,12 @@
         }
     },
     "scripts": {
-        "test": "php tests/run.php"
+        "analyse": "phpstan analyse --level=9 --no-progress",
+        "test": "php tests/run.php",
+        "verify": ["@analyse", "@test"]
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1"
     },
     "config": {
         "platform-check": true,
