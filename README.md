@@ -19,8 +19,8 @@ pam doctor --fix
 Deterministic, strict bridge testing for PAM Native applications and plugins.
 
 ```bash
-pam add testing
-pam doctor
+pam composer require pushinbr/pam-native-testing
+pam doctor --fix
 ```
 
 ```php
@@ -56,9 +56,9 @@ if (!$health['healthy'] || !$diff->accepted) {
 
 ## What installation does
 
-`pam add testing` resolves the official compatible package, performs a non-mutating Composer preflight, updates the normal `composer.json` and `composer.lock`, refreshes generated native integration when required, and leaves the project ready for `pam doctor` validation.
+`pam composer require pushinbr/pam-native-testing` installs the package through the project's normal `composer.json` and `composer.lock`. Run `pam doctor --fix` afterward to validate the environment and regenerate native integration when required.
 
-Use `pam packages` to inspect availability and `pam remove testing` to uninstall the capability safely. Direct Composer commands are an advanced interoperability path; PAM is the supported application workflow.
+Use `pam packages` to inspect direct installed Composer dependencies and `pam composer remove pushinbr/pam-native-testing` to uninstall the capability.
 
 ## API guide
 
