@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0 - 2026-08-24
+
+- Add platform-neutral golden-image comparison with explicit error tolerances.
+- Add startup screen health checks that reject black and transparent frames.
+- Add PHPStan level 9 verification and strict PHP 8.5 dependency locking.
+
 ## 0.2.0 - 2026-08-23
 
 - Require PHP 8.5 and PAM Native 0.8.
